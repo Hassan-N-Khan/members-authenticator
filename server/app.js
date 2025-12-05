@@ -22,7 +22,11 @@ app.use(express.urlencoded({ extended: false }));
 
 app.use(express.static(path.join(__dirname, "../client")));
 
-app.use(cors());
+app.use(cors({
+  origin: "http://localhost:5173",
+  credentials: true
+}));
+
 app.use(express.json());
 
 app.post("/sign-up", async (req, res, next) => {
@@ -90,9 +94,16 @@ app.get("/log-out", (req, res, next) => {
     if (err) {
       return next(err);
     }
-    res.redirect("/");
   });
 });
+
+app.get("/session", (req, res) => {
+  if (req.user) {
+    return res.json({ loggedIn: true, user: req.user });
+  }
+  res.json({ loggedIn: false });
+});
+
 
 app.use((req, res) => {
   res.status(404).send("Not Found");

@@ -1,9 +1,8 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
-function Login() {
+function Login({setUser}) {
   const navigate = useNavigate();
-  const [user, setUser] = useState(null);     // Store logged-in user
   const [error, setError] = useState("");     // Store login errors
 
   const handleSubmit = async (e) => {
@@ -21,20 +20,15 @@ function Login() {
     const data = await response.json();
 
     if (data.success) {
-      setUser({ username: e.target.username.value });
+      setUser(data.user);
       setError("");
-      navigate("/");  // Redirect to default page
+      navigate("/message-board");  // Redirect to default page
     } else {
       setError(data.message || "Invalid credentials");
     }
   };
 
-  return user ? (
-    <div>
-      <h1>Welcome back, {user.username}!</h1>
-      <a href="/">LOG OUT</a>
-    </div>
-  ) : (
+  return (
     <div>
       <h1>Login</h1>
       {error && <p style={{ color: "red" }}>{error}</p>}
