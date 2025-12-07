@@ -1,16 +1,19 @@
 import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import "../styles/MessageBoard.css";
 
-function MessageBoard({ user }) {
+function MessageBoard({ user, setUser }) {
+  const navigate = useNavigate();
   const [message, setMessage] = useState("");
   const [messages, setMessages] = useState([]); 
   const [status, setStatus] = useState("");
 
   useEffect(() => {
     fetch("http://localhost:5001/messages")
-        .then(res => res.json())
-        .then(data => setMessages(data.messages));
-    }, []);
-
+      .then(res => res.json())
+      .then(data => setMessages(data.messages))
+      .catch(err => console.error("Error fetching messages:", err));
+  }, []);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -30,10 +33,10 @@ function MessageBoard({ user }) {
       const data = await res.json();
 
       if (data.success) {
-        // Add new message to UI after DB success
         setMessages([...messages, { username: user.username, message }]);
         setMessage("");
         setStatus("Message posted!");
+        setTimeout(() => setStatus(""), 3000);
       } else {
         setStatus("Failed to send message");
       }
@@ -43,35 +46,56 @@ function MessageBoard({ user }) {
     }
   };
 
+  const handleLogout = async () => {
+    await fetch("http://localhost:5001/log-out", { credentials: "include" });
+    setUser(null);
+    navigate("/");
+  };
+
   return (
-    <div>
-      <h1>Welcome {user.username}</h1>
+    <div className="board-container">
+      {/* Header */}
+      <div className="board-header">
+        <h1 className="board-title">
+          Welcome, <span className="board-username">{user.username}</span>!
+        </h1>
+        <button onClick={handleLogout} className="logout-button">
+          Log Out
+        </button>
+      </div>
 
-      <form onSubmit={handleSubmit}>
-        <textarea
-          placeholder="Write your message here..."
-          rows="4"
-          cols="50"
-          value={message}
-          onChange={(e) => setMessage(e.target.value)}
-        ></textarea>
-        <br />
-        <button type="submit">Post New Message</button>
-      </form>
+      {/* Post Form */}
+      <div className="post-form-container">
+        <form onSubmit={handleSubmit} className="post-form">
+          <textarea
+            className="post-textarea"
+            placeholder="Share your thoughts with the community..."
+            value={message}
+            onChange={(e) => setMessage(e.target.value)}
+          />
+          <button type="submit" className="post-button">
+            Post Message
+          </button>
+        </form>
+        {status && <p className="status-message">{status}</p>}
+      </div>
 
-      <h3>Messages:</h3>
-      <ul>
-        {messages.map((m, i) => (
-          <li key={i}>
-            <strong>{m.username}: </strong>
-            {m.message}
-          </li>
-        ))}
-      </ul>
-
-      {status && <p>{status}</p>}
-
-      <a href="/">LOG OUT</a>
+      {/* Messages */}
+      <div className="messages-container">
+        <h2 className="messages-title">Community Messages</h2>
+        {messages.length === 0 ? (
+          <p className="no-messages">No messages yet. Be the first to post!</p>
+        ) : (
+          <ul className="messages-list">
+            {messages.map((m, i) => (
+              <li key={i} className="message-item">
+                <span className="message-author">{m.username}</span>
+                <p className="message-text">{m.message}</p>
+              </li>
+            ))}
+          </ul>
+        )}
+      </div>
     </div>
   );
 }

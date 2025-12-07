@@ -1,9 +1,10 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import "../styles/Login.css";
 
-function Login({setUser}) {
+function Login({ setUser }) {
   const navigate = useNavigate();
-  const [error, setError] = useState("");     // Store login errors
+  const [error, setError] = useState("");
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -15,6 +16,7 @@ function Login({setUser}) {
         username: e.target.username.value,
         password: e.target.password.value,
       }),
+      credentials: "include"
     });
 
     const data = await response.json();
@@ -22,24 +24,55 @@ function Login({setUser}) {
     if (data.success) {
       setUser(data.user);
       setError("");
-      navigate("/message-board");  // Redirect to default page
+      navigate("/message-board");
     } else {
       setError(data.message || "Invalid credentials");
     }
   };
 
   return (
-    <div>
-      <h1>Login</h1>
-      {error && <p style={{ color: "red" }}>{error}</p>}
-      <form onSubmit={handleSubmit}>
-        <label htmlFor="username">Username</label>
-        <input id="username" name="username" placeholder="Username" type="text" required />
-        <label htmlFor="password">Password</label>
-        <input id="password" name="password" placeholder="Password" type="password" required />
-        <button type="submit">Log In</button>
-      </form>
-      <button onClick={() => navigate("/sign-up")}>Go to Sign Up</button>
+    <div className="auth-container">
+      <div className="auth-card">
+        <h1 className="auth-title">Welcome Back</h1>
+
+        {error && <p className="auth-error">{error}</p>}
+
+        <form onSubmit={handleSubmit} className="auth-form">
+          <label htmlFor="username" className="auth-label">Username</label>
+          <input
+            id="username"
+            name="username"
+            placeholder="Enter username"
+            type="text"
+            required
+            className="auth-input"
+          />
+
+          <label htmlFor="password" className="auth-label">Password</label>
+          <input
+            id="password"
+            name="password"
+            placeholder="Enter password"
+            type="password"
+            required
+            className="auth-input"
+          />
+
+          <button type="submit" className="auth-button">
+            Log In
+          </button>
+        </form>
+
+        <p className="auth-switch">
+          Don't have an account?
+          <button
+            className="auth-link"
+            onClick={() => navigate("/sign-up")}
+          >
+            Sign Up
+          </button>
+        </p>
+      </div>
     </div>
   );
 }
