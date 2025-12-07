@@ -32,6 +32,7 @@ function SignUp() {
         <input id="password" name="password" type="password" required/>
         <button type="submit">Sign Up</button>
       </form>
+      <button onClick={() => navigate("/")}>Go to Login</button>
     </>
   );
 }

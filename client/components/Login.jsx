@@ -39,6 +39,7 @@ function Login({setUser}) {
         <input id="password" name="password" placeholder="Password" type="password" required />
         <button type="submit">Log In</button>
       </form>
+      <button onClick={() => navigate("/sign-up")}>Go to Sign Up</button>
     </div>
   );
 }

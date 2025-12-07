@@ -16,6 +16,12 @@ const pool = new Pool({
     port: 5432, // The default port
 });
 
+app.use((req, res, next) => {
+  console.log(`${req.method} ${req.url}`);
+  next();
+});
+
+
 app.use(session({ secret: "cats", resave: false, saveUninitialized: false }));
 app.use(passport.session());
 app.use(express.urlencoded({ extended: false }));
@@ -30,14 +36,21 @@ app.use(cors({
 app.use(express.json());
 
 app.post("/sign-up", async (req, res, next) => {
- try {
-  const hashedPassword = await bcrypt.hash(req.body.password, 10);
-  await pool.query("INSERT INTO users (username, password) VALUES ($1, $2)", [req.body.username, hashedPassword]);
- } catch (error) {
+  try {
+    const hashedPassword = await bcrypt.hash(req.body.password, 10);
+
+    await pool.query(
+      "INSERT INTO users (username, password) VALUES ($1, $2)",
+      [req.body.username, hashedPassword]
+    );
+
+    return res.json({ success: true });
+  } catch (error) {
     console.error(error);
-    next(error);
-   }
+    return res.json({ success: false, error: "Signup failed" });
+  }
 });
+
 
 passport.use(
   new LocalStrategy(async (username, password, done) => {
@@ -103,6 +116,41 @@ app.get("/session", (req, res) => {
   }
   res.json({ loggedIn: false });
 });
+
+app.get("/messages", async (req, res) => {
+  try {
+    const { rows } = await pool.query(
+      "SELECT username, message, created_at FROM messages ORDER BY created_at ASC"
+    );
+    res.json({ success: true, messages: rows });
+  } catch (err) {
+    console.error("DB FETCH ERROR:", err);
+    res.json({ success: false, messages: [] });
+  }
+});
+
+
+
+app.post("/messages", async (req, res) => {
+  const { user, message } = req.body;
+
+  if (!user || !message) {
+    return res.json({ success: false, error: "Missing fields" });
+  }
+
+  try {
+    await pool.query(
+      "INSERT INTO messages (username, message) VALUES ($1, $2)",
+      [user, message]
+    );
+
+    res.json({ success: true });
+  } catch (err) {
+    console.error("DB INSERT ERROR:", err);
+    res.json({ success: false, error: err.message });
+  }
+});
+
 
 
 app.use((req, res) => {
