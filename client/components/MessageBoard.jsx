@@ -47,14 +47,28 @@ function MessageBoard({ user, setUser }) {
   };
 
   const handleLogout = async () => {
-    await fetch("http://localhost:5001/log-out", { credentials: "include" });
-    setUser(null);
-    navigate("/");
-  };
+  try {
+    
+    const res = await fetch("http://localhost:5001/log-out", {
+      method: "GET",
+      credentials: "include",
+    });
+    
+    const data = await res.json();
+
+    if (res.ok) {
+      setUser(null);
+      navigate("/");
+    } else {
+      console.error("Logout failed: server returned an error");
+    }
+  } catch (err) {
+    console.error("Logout failed:", err);
+  }
+};
 
   return (
     <div className="board-container">
-      {/* Header */}
       <div className="board-header">
         <h1 className="board-title">
           Welcome, <span className="board-username">{user.username}</span>!
@@ -64,7 +78,6 @@ function MessageBoard({ user, setUser }) {
         </button>
       </div>
 
-      {/* Post Form */}
       <div className="post-form-container">
         <form onSubmit={handleSubmit} className="post-form">
           <textarea
@@ -80,7 +93,6 @@ function MessageBoard({ user, setUser }) {
         {status && <p className="status-message">{status}</p>}
       </div>
 
-      {/* Messages */}
       <div className="messages-container">
         <h2 className="messages-title">Community Messages</h2>
         {messages.length === 0 ? (

@@ -13,7 +13,7 @@ function App() {
     fetch("http://localhost:5001/session", { credentials: "include" })
       .then(res => res.json())
       .then(data => {
-        console.log("SESSION RESPONSE:", data); // <--- ADD THIS
+        console.log("SESSION RESPONSE:", data);
         if (data.loggedIn) {
           setUser(data.user);
         }
@@ -25,25 +25,21 @@ function App() {
       });
   }, []);
 
-
-
   return (
-      <Routes>
-        <Route path="/sign-up" element={<SignUp />} />
+    <Routes>
+      <Route path="/sign-up" element={<SignUp />} />
 
-        <Route
-          path="/message-board"
-          element={
-            <ProtectedRoute user={user} loading={loading}>
-              <MessageBoard user={user} />
-            </ProtectedRoute>
-          }
-        />
+      <Route
+        path="/message-board"
+        element={
+          <ProtectedRoute user={user} loading={loading}>
+            <MessageBoard user={user} setUser={setUser} />
+          </ProtectedRoute>
+        }
+      />
 
-
-        <Route path="/" element={<Login setUser={setUser} />} />
-
-      </Routes>
+      <Route path="/" element={<Login setUser={setUser} />} />
+    </Routes>
   );
 }
 
