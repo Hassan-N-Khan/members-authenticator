@@ -1,6 +1,7 @@
 const express = require("express");
 const app = express();
 const cors = require("cors");
+require('dotenv').config();
 
 const path = require("path");
 const { Pool } = require("pg");
@@ -10,10 +11,11 @@ const LocalStrategy = require('passport-local').Strategy;
 const bcrypt = require("bcryptjs");
 
 const pool = new Pool({
-    host: "localhost", // or wherever the db is hosted
-    user: "hassan",
-    database: "users",
-    port: 5432, // The default port
+  host: process.env.PG_HOST, // or wherever the db is hosted
+  user: process.env.PG_USER,
+  database: process.env.PG_NAME,
+  port: process.env.PG_PORT, // The default port
+  password: process.env.PG_PASSWORD
 });
 
 app.use((req, res, next) => {
