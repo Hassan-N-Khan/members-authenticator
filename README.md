@@ -25,6 +25,15 @@ Deployment: Render
 
 ------------------------------------------------------------
 
+# Working Project
+
+<img src="image.png" alt="screenshot" width="400"/>
+
+<img src="image-1.png" alt="screenshot" width="400"/>
+
+
+------------------------------------------------------------
+
 # Running the Project Locally
 
 Below are the full steps to set up the backend, frontend, and database on your computer.
